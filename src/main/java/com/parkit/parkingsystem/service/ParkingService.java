@@ -98,23 +98,29 @@ public class ParkingService {
     }
 
     public void processExitingVehicle() {
-        try{
-            String vehicleRegNumber = getVehichleRegNumber();
-            Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
-            Date outTime = new Date();
-            ticket.setOutTime(outTime);
-            fareCalculatorService.calculateFare(ticket);
-            if(ticketDAO.updateTicket(ticket)) {
-                ParkingSpot parkingSpot = ticket.getParkingSpot();
-                parkingSpot.setAvailable(true);
-                parkingSpotDAO.updateParking(parkingSpot);
-                System.out.println("Please pay the parking fare:" + ticket.getPrice());
-                System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
-            }else{
-                System.out.println("Unable to update ticket information. Error occurred");
-            }
-        }catch(Exception e){
-            logger.error("Unable to process exiting vehicle",e);
-        }
-    }
+		try {
+			String vehicleRegNumber = getVehichleRegNumber();
+			Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
+			Date outTime = new Date();
+			ticket.setOutTime(outTime);
+			fareCalculatorService.calculateFare(ticket);
+			if (ticketDAO.updateTicket(ticket)) {
+				ParkingSpot parkingSpot = ticket.getParkingSpot();
+				parkingSpot.setAvailable(true);
+				parkingSpotDAO.updateParking(parkingSpot);
+				if (ticket.parkingDurationInMinutes(ticket.getInTime(), outTime) < 30) {
+					System.out.println("Stationnement gratuit : La durée de votre stationnement est inférieur à 30 min.");
+				} else {
+					ticket.calculReduction();
+					System.out.println("Please pay the parking fare:" + ticket.getPrice());
+				}
+				System.out.println(
+						"Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
+			} else {
+				System.out.println("Unable to update ticket information. Error occurred");
+			}
+		} catch (Exception e) {
+			logger.error("Unable to process exiting vehicle", e);
+		}
+	}
 }
