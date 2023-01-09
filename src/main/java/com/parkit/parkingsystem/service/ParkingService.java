@@ -111,7 +111,7 @@ public class ParkingService {
 				if (ticket.parkingDurationInMinutes(ticket.getInTime(), outTime) < 30) {
 					System.out.println("Stationnement gratuit : La durée de votre stationnement est inférieur à 30 min.");
 				} else {
-					ticket.calculReduction();
+					ticket.calculReduction(ticketDAO);
 					System.out.println("Please pay the parking fare:" + ticket.getPrice());
 				}
 				System.out.println(

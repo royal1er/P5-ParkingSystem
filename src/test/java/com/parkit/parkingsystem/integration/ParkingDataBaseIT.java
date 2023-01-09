@@ -44,11 +44,12 @@ public class ParkingDataBaseIT {
     private void setUpPerTest() throws Exception {
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-        dataBasePrepareService.clearDataBaseEntries();
+        //dataBasePrepareService.clearDataBaseEntries();
     }
 
     @AfterAll
     private static void tearDown(){
+    	dataBasePrepareService.clearDataBaseEntries();
 
     }
 
@@ -65,7 +66,6 @@ public class ParkingDataBaseIT {
 
     @Test
     public void testParkingLotExit(){
-        testParkingACar();
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         parkingService.processIncomingVehicle();
         parkingService.processExitingVehicle();

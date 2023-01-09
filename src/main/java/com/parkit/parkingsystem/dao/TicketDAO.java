@@ -86,4 +86,26 @@ public class TicketDAO {
         }
         return false;
     }
+    
+	public Integer getFrequencyOfVehicle(String VehicleNumber) {
+		Connection con = null;
+		int result = 0;
+		try {
+			con = dataBaseConfig.getConnection();
+			PreparedStatement ps = con.prepareStatement(DBConstants.CHECK_VEHICL);
+			ps.setString(1, VehicleNumber);
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				result = rs.getInt(1);
+			}
+			dataBaseConfig.closeResultSet(rs);
+			dataBaseConfig.closePreparedStatement(ps);
+		} catch (Exception ex) {
+			System.out.println("Error " + ex);
+		} finally {
+			dataBaseConfig.closeConnection(con);
+		}
+		return result;
+
+	}
 }

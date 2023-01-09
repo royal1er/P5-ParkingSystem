@@ -2,6 +2,7 @@ package com.parkit.parkingsystem.model;
 import com.parkit.parkingsystem.config.DataBaseConfig;
 import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
+import com.parkit.parkingsystem.dao.TicketDAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,6 +19,8 @@ public class Ticket {
     private Date inTime;
     private Date outTime;
     private ParkingSpotDAO parkingSpotDAO;
+    private TicketDAO ticketDAO;
+    
 	public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
     public int getId() {
@@ -95,32 +98,10 @@ public class Ticket {
 		return duration;
 	}
 
-    public Integer getFrequencyOfVehicle(String VehicleNumber) {
-		Connection con = null;
-		int result = 0;
+    public void calculReduction(TicketDAO myTicketDao) {
 		try {
-			con = dataBaseConfig.getConnection();
-			PreparedStatement ps = con.prepareStatement(DBConstants.CHECK_VEHICL);
-			ps.setString(1, VehicleNumber);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				result = rs.getInt(1);
-			}
-			dataBaseConfig.closeResultSet(rs);
-			dataBaseConfig.closePreparedStatement(ps);
-		} catch (Exception ex) {
-			System.out.println("Error " + ex);
-		} finally {
-			dataBaseConfig.closeConnection(con);
-		}
-		return result;
-
-	}
-
-    public void calculReduction() {
-		try {
-			System.out.println("Occurence du véhicule : " + getFrequencyOfVehicle(getVehicleRegNumber()));
-			if (getFrequencyOfVehicle(getVehicleRegNumber()) > 2) {
+			System.out.println("Occurence du véhicule : " + myTicketDao.getFrequencyOfVehicle(getVehicleRegNumber()));
+			if (myTicketDao.getFrequencyOfVehicle(getVehicleRegNumber()) > 2) {
 				System.out.println("En tant que client régulier vous avez droit à une réduction de 5%");
 				double calcul = getPrice() * 5;
 				double reduction = calcul / 100;
